@@ -277,47 +277,75 @@
 
   <!-- TAB 4: MAPPING PRODUK -->
   <div id="tab-data" class="container">
-    <div class="card">
-      <div class="card-title">Kelola Database, HJA, Nego & Gabungkan Produk</div>
-      
-      <div class="grid-3" style="margin-bottom:8px;">
-        <div class="form-group" style="margin-bottom:0;"><label>Status Obat</label>
-            <select id="filter-status-select" onchange="currentMappingPage=1; renderMappingTable()">
-                <option value="ACTIVE">✅ Aktif</option>
-                <option value="DISCONTINUED">🚫 Discontinue</option>
-                <option value="ALL">Semua Status</option>
-            </select>
-        </div>
-        <div class="form-group" style="margin-bottom:0;"><label>Filter PBF</label><select id="filter-pbf-select" onchange="currentMappingPage=1; renderMappingTable()"><option value="ALL">Semua PBF</option></select></div>
-        <div class="form-group" style="margin-bottom:0;"><label>Cari Obat</label><input type="text" id="mapping-search-input" placeholder="Ketik nama..." oninput="currentMappingPage=1; renderMappingTable()"></div>
-      </div>
+    <div class="pbf-card">
+  <div class="pbf-header">
+    <h4>PBF 1</h4>
+    <button type="button" class="btn-hapus">Hapus</button>
+  </div>
 
-      <div style="display:flex; justify-content:space-between; align-items:center; margin:8px 0; font-size:0.78rem; flex-wrap:wrap; gap:6px;">
-        <div><input type="checkbox" id="select-all-checkbox" onclick="toggleSelectAll(this)"> <label for="select-all-checkbox" style="display:inline; color:var(--text);">Pilih Semua</label></div>
-        <div style="display:flex; gap:6px; flex-wrap:wrap;">
-          <button class="btn btn-small btn-success" style="width:auto; margin-top:0; color:#000;" onclick="openAddProductModal()">+ Tambah</button>
-          <button class="btn btn-small btn-outline-success" style="width:auto; margin-top:0; border-color:var(--neon-cyan); color:var(--neon-cyan);" onclick="mergeSelectedProducts()">🔗 Gabungkan</button>
-          <button class="btn btn-small btn-outline" style="width:auto; margin-top:0;" onclick="exportMappingToExcel()">📥 Ekspor</button>
-          <button class="btn btn-small btn-outline-danger" style="width:auto; margin-top:0;" onclick="deleteSelectedProducts()">🗑️ Hapus</button>
-        </div>
-      </div>
-      
-      <div class="table-container">
-        <table id="mapping-table">
-          <thead>
-            <tr><th style="width:30px;">#</th><th>Apotek (HJA & Margin)</th><th>PBF & Diskon Bertingkat</th><th>Aksi</th></tr>
-          </thead>
-          <tbody></tbody>
-        </table>
-      </div>
-
-      <div class="pagination-bar">
-        <button class="btn btn-small btn-outline" onclick="changeMappingPage(-1)">⬅ Sebelumnya</button>
-        <span id="mapping-page-info" style="color:var(--neon-cyan); font-weight:800;">Hal 1 / 1</span>
-        <button class="btn btn-small btn-outline" onclick="changeMappingPage(1)">Selanjutnya ➡</button>
-      </div>
+  <!-- Baris 1: Informasi Dasar -->
+  <div class="form-row">
+    <div class="form-group">
+      <label>Nama PBF</label>
+      <select name="nama_pbf[]">
+        <option value="Rubel Anugerah M">Rubel Anugerah M</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Nama Barang PBF</label>
+      <input type="text" name="nama_barang_pbf[]" placeholder="Nama Barang">
     </div>
   </div>
+
+  <!-- Baris 2: Harga, Satuan, dan Stok PBF -->
+  <div class="form-row">
+    <div class="form-group">
+      <label>Harga PBF (Rp)</label>
+      <input type="number" name="harga_pbf[]" placeholder="0">
+    </div>
+    <div class="form-group">
+      <label>Satuan PBF</label>
+      <input type="text" name="satuan_pbf[]" placeholder="FLS/BOX">
+    </div>
+    <div class="form-group">
+      <label>Stok PBF</label>
+      <input type="number" name="stok_pbf[]" placeholder="0">
+    </div>
+  </div>
+
+  <!-- Baris 3: Diskon Bertingkat -->
+  <div class="form-row">
+    <div class="form-group">
+      <label>Disc 1 (%)</label>
+      <input type="number" step="0.1" name="disc_1[]" placeholder="0">
+    </div>
+    <div class="form-group">
+      <label>Disc 2 (%)</label>
+      <input type="number" step="0.1" name="disc_2[]" placeholder="0">
+    </div>
+    <div class="form-group">
+      <label>Disc 3 (%)</label>
+      <input type="number" step="0.1" name="disc_3[]" placeholder="0">
+    </div>
+  </div>
+
+  <!-- Baris 4: Skema Promo / Bonus -->
+  <div class="form-row promo-box">
+    <div class="form-group">
+      <label>Min. Beli (Promo)</label>
+      <input type="number" name="min_beli[]" placeholder="Contoh: 12">
+    </div>
+    <div class="form-group">
+      <label>Bonus (Qty)</label>
+      <input type="number" name="bonus_qty[]" placeholder="Contoh: 1">
+    </div>
+    <div class="form-group">
+      <label>Harga Efektif/Unit (Auto)</label>
+      <input type="number" name="harga_efektif[]" readonly placeholder="Otomatis">
+    </div>
+  </div>
+</div>
+
 
   <!-- TAB 5: DASHBOARD & CEKLIST -->
   <div id="tab-dashboard" class="container">
@@ -1727,24 +1755,29 @@
       XLSX.writeFile(wb, "Database_Apotek_Gelora_Medika.xlsx");
     }
 
-    function openEditModal(id) {
-      const prod = productsDB.find(p => p.id === id);
-      if (!prod) return;
+    function hitungHargaNetto(hargaAwal, d1, d2, d3, minBeli, bonusQty) {
+    // 1. Hitung potongan diskon bertingkat
+    let hargaDiskon = hargaAwal;
+    if (d1 > 0) hargaDiskon *= (1 - d1 / 100);
+    if (d2 > 0) hargaDiskon *= (1 - d2 / 100);
+    if (d3 > 0) hargaDiskon *= (1 - d3 / 100);
 
-      document.getElementById('modal-title').innerText = "Edit Produk & Nego Harga PBF";
-      document.getElementById('edit-prod-id').value = prod.id;
-      document.getElementById('edit-pharmacy-name').value = prod.pharmacyName;
-      document.getElementById('edit-pharmacy-unit').value = prod.pharmacyUnit;
-      document.getElementById('edit-sell-price').value = prod.sellPrice || 0;
-      document.getElementById('edit-adc').value = prod.adc || 0;
-      document.getElementById('edit-category').value = prod.category || 'AUTO';
-      document.getElementById('edit-golongan').value = prod.golongan || autoDetectGolongan(prod.pharmacyName);
+    // 2. Hitung penyesuaian jika ada promo bonus (misal: Beli 12 Bonus 1)
+    let totalHargaBeli = hargaDiskon * minBeli;
+    let totalBarangDiterima = minBeli + bonusQty;
 
-      editingSuppliers = JSON.parse(JSON.stringify(prod.suppliers || []));
-      renderEditSuppliersList();
-
-      document.getElementById('edit-modal').style.display = 'flex';
+    // Jika minBeli/bonus diisi 0 atau kosong, gunakan hargaDiskon standar
+    if (minBeli > 0 && totalBarangDiterima > 0) {
+        return totalHargaBeli / totalBarangDiterima;
     }
+    
+    return hargaDiskon;
+}
+
+// Contoh Penggunaan:
+// Harga: Rp 120.000, Disc 1: 5%, Disc 2: 2%, Beli 12 Bonus 1
+const hargaNett = hitungHargaNetto(120000, 5, 2, 0, 12, 1);
+console.log("Harga Efektif/Unit:", hargaNett); 
 
     function openAddProductModal() {
       document.getElementById('modal-title').innerText = "Tambah Produk Baru";
