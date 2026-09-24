@@ -2,106 +2,370 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Order Gelora Medika v50 (Anti-Bisu)</title>
-  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Form Entry Obat & PBF</title>
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; -webkit-tap-highlight-color: transparent; transition: background 0.2s, color 0.2s; }
-    
-    body.dark-mode { 
-      --bg: #090d16; --card: #131c31; --border: #2c3e50; --text: #f8fafc; --muted: #a0aec0; 
-      --neon-cyan: #00d2ff; --neon-pink: #ff3366; --neon-green: #00e676; --neon-yellow: #ffea00; --accent: #6366f1;
-      --table-odd: #111b33; --table-even: #1a2744; --table-hover: #22345e;
-    }
-    body.light-mode { 
-      --bg: #f1f5f9; --card: #ffffff; --border: #cbd5e1; --text: #0f172a; --muted: #64748b; 
-      --neon-cyan: #0284c7; --neon-pink: #e11d48; --neon-green: #16a34a; --neon-yellow: #ca8a04; --accent: #4f46e5;
-      --table-odd: #f8fafc; --table-even: #f1f5f9; --table-hover: #e2e8f0;
+    * {
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
 
-    body { background-color: var(--bg); color: var(--text); padding-bottom: 75px; min-height: 100vh; }
-    
-    .header { 
-      padding: 12px 16px; background: var(--card); backdrop-filter: blur(10px); 
-      position: sticky; top: 0; z-index: 10; border-bottom: 2px solid var(--neon-cyan); 
-      display: flex; justify-content: space-between; align-items: center; 
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    body {
+      background-color: #f0f4f8;
+      margin: 0;
+      padding: 12px;
+      color: #333;
     }
-    .header-left { display: flex; align-items: center; gap: 10px; }
-    .back-btn { 
-      background: rgba(0, 210, 255, 0.15); border: 1px solid var(--neon-cyan); color: var(--neon-cyan); 
-      width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; 
-      font-size: 1rem; cursor: pointer; font-weight: bold;
+
+    .container {
+      max-width: 480px;
+      margin: 0 auto;
+      background: #ffffff;
+      border: 2px solid #3b82f6;
+      border-radius: 16px;
+      padding: 16px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
     }
-    .header h1 { font-size: 0.95rem; font-weight: 800; color: var(--text); text-transform: uppercase; letter-spacing: 0.8px; }
-    .header-right { display: flex; align-items: center; gap: 6px; }
-    .header span { font-size: 0.68rem; background: rgba(0, 230, 118, 0.2); color: var(--neon-green); padding: 3px 8px; border-radius: 6px; font-weight: 700; border: 1px solid rgba(0, 230, 118, 0.5); }
-    .theme-toggle { background: transparent; border: 1px solid var(--border); color: var(--text); width: 32px; height: 32px; border-radius: 8px; cursor: pointer; font-size: 1rem; display: flex; align-items: center; justify-content: center; }
 
-    .container { padding: 12px; display: none; }
-    .container.active { display: block; animation: fadeIn 0.15s ease-out; }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(3px); } to { opacity: 1; transform: translateY(0); } }
+    .form-row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
 
-    .card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 12px; margin-bottom: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
-    .card-title { font-size: 0.78rem; color: var(--neon-cyan); text-transform: uppercase; font-weight: 800; margin-bottom: 8px; letter-spacing: 0.5px; }
+    .form-group {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
 
-    .form-group { margin-bottom: 10px; position: relative; }
-    label { display: block; font-size: 0.75rem; color: var(--muted); margin-bottom: 4px; font-weight: 700; }
-    input, select, textarea { width: 100%; padding: 10px 12px; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-size: 0.85rem; outline: none; }
-    input:focus, select:focus, textarea:focus { border-color: var(--neon-cyan); box-shadow: 0 0 10px rgba(0, 210, 255, 0.3); }
-    input[type=checkbox] { width: 18px; height: 18px; accent-color: var(--neon-cyan); }
+    .form-group label {
+      font-size: 11px;
+      font-weight: 600;
+      color: #1e3a8a;
+      margin-bottom: 4px;
+    }
+
+    .form-group label .badge-auto {
+      color: #16a34a;
+      font-weight: normal;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 8px 10px;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      background-color: #f8fafc;
+      font-size: 13px;
+      font-weight: 600;
+      color: #0f172a;
+      outline: none;
+    }
+
+    input:focus, select:focus {
+      border-color: #2563eb;
+      background-color: #ffffff;
+    }
+
+    input[readonly] {
+      background-color: #e2e8f0;
+      color: #475569;
+    }
+
+    /* Section PBF Header */
+    .pbf-section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 20px;
+      margin-bottom: 12px;
+    }
+
+    .pbf-title {
+      font-size: 13px;
+      font-weight: bold;
+      color: #0284c7;
+    }
+
+    .btn-add-pbf {
+      background-color: #ffffff;
+      border: 1px solid #16a34a;
+      color: #16a34a;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    /* Card PBF */
+    .pbf-card {
+      border: 1px solid #bfdbfe;
+      background-color: #eff6ff;
+      border-radius: 12px;
+      padding: 12px;
+      margin-bottom: 12px;
+    }
+
+    .pbf-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .pbf-card-header h4 {
+      margin: 0;
+      font-size: 13px;
+      color: #1e40af;
+    }
+
+    .btn-hapus {
+      background-color: #ffffff;
+      border: 1px solid #ef4444;
+      color: #ef4444;
+      padding: 3px 10px;
+      border-radius: 12px;
+      font-size: 11px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .promo-box {
+      background-color: #dbeafe;
+      border: 1px dashed #60a5fa;
+      border-radius: 8px;
+      padding: 8px;
+      margin-top: 8px;
+    }
+
+    /* Tombol Aksi Bawah */
+    .action-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 16px;
+    }
+
+    .btn-simpan {
+      background-color: #16a34a;
+      color: white;
+      border: none;
+      padding: 12px;
+      border-radius: 8px;
+      font-weight: bold;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    .btn-batal {
+      background-color: #ffffff;
+      color: #333;
+      border: 1px solid #cbd5e1;
+      padding: 10px;
+      border-radius: 8px;
+      font-weight: bold;
+      font-size: 13px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <form id="formApotek">
+    <!-- Baris Satuan Dasar & Harga Jual -->
+    <div class="form-row">
+      <div class="form-group">
+        <label>Satuan Dasar</label>
+        <input type="text" value="FLS">
+      </div>
+      <div class="form-group">
+        <label>Harga Jual Apotek (Rp)</label>
+        <input type="number" value="14338">
+      </div>
+    </div>
+
+    <!-- Baris ADC, ABC, Golongan -->
+    <div class="form-row">
+      <div class="form-group">
+        <label>ADC/Hari <span class="badge-auto">(Otomatis)</span></label>
+        <input type="number" value="0" readonly>
+      </div>
+      <div class="form-group">
+        <label>ABC</label>
+        <select>
+          <option selected>Otomatis</option>
+          <option>A</option>
+          <option>B</option>
+          <option>C</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Golongan</label>
+        <select>
+          <option selected>Hijau</option>
+          <option>Bebas Terbatas</option>
+          <option>Keras</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Section PBF Header -->
+    <div class="pbf-section-header">
+      <div class="pbf-title">Daftar PBF, Nego & Diskon Bertingkat:</div>
+      <button type="button" class="btn-add-pbf" onclick="tambahPBF()">+ Tambah PBF Nego</button>
+    </div>
+
+    <!-- Tempat Kartu PBF Di-generate -->
+    <div id="pbf-container"></div>
+
+    <!-- Tombol Simpan & Batal -->
+    <div class="action-buttons">
+      <button type="button" class="btn-simpan">💾 Simpan Data</button>
+      <button type="button" class="btn-batal">Batal</button>
+    </div>
+  </form>
+</div>
+
+<script>
+  let pbfCount = 0;
+
+  // Fungsi untuk menambah kartu PBF baru
+  function tambahPBF() {
+    pbfCount++;
+    const container = document.getElementById('pbf-container');
     
-    .search-results { position: absolute; top: 100%; left: 0; right: 0; background: var(--card); border: 1px solid var(--neon-cyan); border-radius: 8px; max-height: 200px; overflow-y: auto; z-index: 50; display: none; box-shadow: 0 10px 25px rgba(0,0,0,0.3); }
-    .search-item { padding: 10px 12px; border-bottom: 1px solid var(--border); cursor: pointer; }
-    .search-item:hover { background: rgba(0, 210, 255, 0.1); }
-    .search-item-title { font-weight: 700; font-size: 0.85rem; color: var(--text); }
-    .search-item-sub { font-size: 0.72rem; color: var(--muted); }
+    const cardHTML = `
+      <div class="pbf-card" id="pbf-card-${pbfCount}">
+        <div class="pbf-card-header">
+          <h4 class="pbf-label">PBF ${pbfCount}</h4>
+          <button type="button" class="btn-hapus" onclick="hapusPBF(${pbfCount})">Hapus</button>
+        </div>
 
-    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; }
+        <!-- Nama PBF & Nama Barang -->
+        <div class="form-row">
+          <div class="form-group">
+            <label>Nama PBF</label>
+            <select name="nama_pbf[]">
+              <option value="Rubel Anugerah M">Rubel Anugerah M</option>
+              <option value="Singgasana">Singgasana</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Nama Barang PBF</label>
+            <input type="text" name="nama_barang_pbf[]" placeholder="Nama Barang">
+          </div>
+        </div>
 
-    .calc-box { background: var(--bg); border: 1px dashed var(--neon-cyan); border-radius: 8px; padding: 10px; margin-top: 8px; }
-    .calc-row { display: flex; justify-content: space-between; font-size: 0.82rem; margin-bottom: 4px; color: var(--text); }
-    .calc-row.highlight { font-weight: 800; font-size: 1rem; color: var(--neon-green); border-top: 1px solid var(--border); padding-top: 6px; margin-top: 4px; }
+        <!-- Harga, Satuan, Stok -->
+        <div class="form-row">
+          <div class="form-group">
+            <label>Harga PBF (Rp)</label>
+            <input type="number" name="harga_pbf[]" class="calc-input" placeholder="0" oninput="hitungPBF(this)">
+          </div>
+          <div class="form-group">
+            <label>Satuan PBF</label>
+            <input type="text" name="satuan_pbf[]" placeholder="FLS/BOX">
+          </div>
+          <div class="form-group">
+            <label>Stok PBF</label>
+            <input type="number" name="stok_pbf[]" placeholder="0">
+          </div>
+        </div>
 
-    .supplier-card { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 10px; margin-bottom: 10px; position: relative; overflow: hidden; }
-    .supplier-card.best { border-color: var(--neon-green); background: rgba(0, 230, 118, 0.08); box-shadow: 0 0 12px rgba(0, 230, 118, 0.15); }
-    .supplier-card.empty { border-color: rgba(255, 51, 102, 0.4); background: rgba(255, 51, 102, 0.05); opacity: 0.85; }
+        <!-- Diskon Bertingkat -->
+        <div class="form-row">
+          <div class="form-group">
+            <label>Disc 1 (%)</label>
+            <input type="number" step="0.1" name="disc_1[]" class="calc-input" placeholder="0" oninput="hitungPBF(this)">
+          </div>
+          <div class="form-group">
+            <label>Disc 2 (%)</label>
+            <input type="number" step="0.1" name="disc_2[]" class="calc-input" placeholder="0" oninput="hitungPBF(this)">
+          </div>
+          <div class="form-group">
+            <label>Disc 3 (%)</label>
+            <input type="number" step="0.1" name="disc_3[]" class="calc-input" placeholder="0" oninput="hitungPBF(this)">
+          </div>
+        </div>
+
+        <!-- Promo Bonus & Harga Efektif -->
+        <div class="promo-box">
+          <div class="form-row" style="margin-bottom: 0;">
+            <div class="form-group">
+              <label>Min. Beli</label>
+              <input type="number" name="min_beli[]" class="calc-input" placeholder="12" oninput="hitungPBF(this)">
+            </div>
+            <div class="form-group">
+              <label>Bonus (Qty)</label>
+              <input type="number" name="bonus_qty[]" class="calc-input" placeholder="1" oninput="hitungPBF(this)">
+            </div>
+            <div class="form-group">
+              <label>HPP Efektif (Rp)</label>
+              <input type="number" name="harga_efektif[]" class="harga-efektif" readonly placeholder="Otomatis">
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+
+    container.insertAdjacentHTML('beforeend', cardHTML);
+  }
+
+  // Fungsi untuk menghapus kartu PBF
+  function hapusPBF(id) {
+    const card = document.getElementById(`pbf-card-${id}`);
+    if (card) card.remove();
+    updateUrutanPBF();
+  }
+
+  // Merapikan nomor PBF 1, PBF 2, dst. setelah ada yang dihapus
+  function updateUrutanPBF() {
+    const cards = document.querySelectorAll('.pbf-card');
+    cards.forEach((card, index) => {
+      card.querySelector('.pbf-label').innerText = `PBF ${index + 1}`;
+    });
+  }
+
+  // Rumus kalkulasi otomatis Diskon Bertingkat & Promo Bonus
+  function hitungPBF(element) {
+    const card = element.closest('.pbf-card');
     
-    .mapping-box { background: rgba(128,128,128,0.05); border: 1px solid var(--border); border-radius: 6px; padding: 8px; margin: 6px 0; }
-    .pbf-name-tag { font-size: 0.8rem; font-weight: 800; color: var(--neon-cyan); text-transform: uppercase; margin-bottom: 2px; }
-    .pbf-item-title { font-size: 0.88rem; font-weight: 700; color: var(--text); }
-    
-    .badge { display: inline-block; font-size: 0.62rem; padding: 2px 6px; border-radius: 4px; font-weight: 800; text-transform: uppercase; margin-bottom: 4px; }
-    .badge-fast { background: var(--neon-pink); color: #fff; }
-    .badge-medium { background: var(--neon-yellow); color: #000; }
-    .badge-slow { background: var(--neon-cyan); color: #000; }
-    .badge-best { background: var(--neon-green); color: #000; }
-    .badge-secondary { background: var(--border); color: var(--muted); }
-    .badge-danger { background: var(--neon-pink); color: #fff; }
-    .badge-golongan { background: rgba(99, 102, 241, 0.2); color: var(--accent); border: 1px solid var(--accent); }
-    
-    .status-pending { background: rgba(255, 234, 0, 0.2); color: var(--neon-yellow); border: 1px solid var(--neon-yellow); }
-    .status-received { background: rgba(0, 230, 118, 0.2); color: var(--neon-green); border: 1px solid var(--neon-green); }
-    .status-canceled { background: rgba(255, 51, 102, 0.2); color: var(--neon-pink); border: 1px solid var(--neon-pink); text-decoration: line-through; }
-    .status-discontinued { background: rgba(255, 51, 102, 0.1); color: var(--neon-pink); border: 1px dashed var(--neon-pink); }
-    
-    .status-paid { background: rgba(0, 230, 118, 0.2); color: var(--neon-green); border: 1px solid var(--neon-green); }
-    .status-unpaid { background: rgba(255, 51, 102, 0.2); color: var(--neon-pink); border: 1px solid var(--neon-pink); }
-    .status-partial { background: rgba(255, 234, 0, 0.2); color: var(--neon-yellow); border: 1px solid var(--neon-yellow); }
+    const harga = parseFloat(card.querySelector('[name="harga_pbf[]"]').value) || 0;
+    const d1 = parseFloat(card.querySelector('[name="disc_1[]"]').value) || 0;
+    const d2 = parseFloat(card.querySelector('[name="disc_2[]"]').value) || 0;
+    const d3 = parseFloat(card.querySelector('[name="disc_3[]"]').value) || 0;
+    const minBeli = parseFloat(card.querySelector('[name="min_beli[]"]').value) || 0;
+    const bonusQty = parseFloat(card.querySelector('[name="bonus_qty[]"]').value) || 0;
 
-    .alert-board { background: rgba(255, 51, 102, 0.1); border: 1px solid var(--neon-pink); border-radius: 12px; padding: 10px; margin-bottom: 12px; display: none; }
-    .alert-header { display: flex; justify-content: space-between; font-weight: 800; font-size: 0.88rem; color: var(--neon-pink); margin-bottom: 8px; }
-    .alert-list { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; }
-    .alert-item { min-width: 165px; background: var(--bg); border: 1px solid rgba(255,51,102,0.5); border-radius: 8px; padding: 8px; font-size: 0.75rem; cursor: pointer; }
-    .alert-item.routine { border-color: rgba(0, 210, 255, 0.5); background: rgba(0, 210, 255, 0.05); }
-    .alert-item strong { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--text); }
+    // 1. Hitung Potongan Diskon Bertingkat
+    let hargaNett = harga;
+    if (d1 > 0) hargaNett *= (1 - d1 / 100);
+    if (d2 > 0) hargaNett *= (1 - d2 / 100);
+    if (d3 > 0) hargaNett *= (1 - d3 / 100);
 
-    .instruction-box { background: rgba(255, 234, 0, 0.08); border: 1px solid var(--neon-yellow); border-radius: 8px; padding: 10px; font-size: 0.75rem; color: var(--text); margin-bottom: 10px; line-height: 1.4; }
+    // 2. Hitung Efek Promo Bonus (misal Beli 12 dapat 13 barang)
+    let hargaEfektif = hargaNett;
+    if (minBeli > 0 && bonusQty > 0) {
+      const totalBayar = hargaNett * minBeli;
+      const totalDapat = minBeli + bonusQty;
+      hargaEfektif = totalBayar / totalDapat;
+    }
 
+    // Tampilkan hasil pembulatan ke input HPP Efektif
+    card.querySelector('.harga-efektif').value = Math.round(hargaEfektif);
+  }
+
+  // Generate 1 PBF secara otomatis saat halaman dibuka pertama kali
+  window.onload = function() {
+    tambahPBF();
+  };
+</script>
+
+</body>
+</html>
     .btn { width: 100%; padding: 10px; border: none; border-radius: 8px; background: var(--accent); color: white; font-weight: 800; font-size: 0.85rem; cursor: pointer; margin-top: 6px; box-shadow: 0 0 10px rgba(99, 102, 241, 0.3); }
     .btn-success { background: var(--neon-green); color: #000; box-shadow: 0 0 10px rgba(0, 230, 118, 0.3); }
     .btn-danger { background: var(--neon-pink); color: #fff; box-shadow: 0 0 10px rgba(255, 51, 102, 0.3); }
